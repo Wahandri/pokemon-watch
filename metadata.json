@@ -1,0 +1,6 @@
+{
+  "name": "PokéWatch GBA - Xiaomi Watch 2",
+  "description": "Juego de Pokémon estilo GBA para Xiaomi Watch 2 con sensor de giroscopio para controlar el personaje y recolectar bayas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
