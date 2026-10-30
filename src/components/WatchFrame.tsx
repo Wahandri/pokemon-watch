@@ -27,7 +27,7 @@ export const WatchFrame: React.FC<WatchFrameProps> = ({
           onClick={onToggleBezel}
           aria-label="Ver marco Xiaomi Watch 2"
           title="Ver marco Xiaomi Watch 2"
-          className="absolute top-4 right-4 z-50 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-full px-3 py-1.5 text-xs flex items-center gap-1.5 shadow-lg backdrop-blur-sm transition-transform active:scale-95"
+          className="watch-hide absolute top-4 right-4 z-50 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-full px-3 py-1.5 text-xs flex items-center gap-1.5 shadow-lg backdrop-blur-sm transition-transform active:scale-95"
         >
           <Watch className="w-3.5 h-3.5 text-emerald-400" />
           <span>Marco Xiaomi Watch 2</span>

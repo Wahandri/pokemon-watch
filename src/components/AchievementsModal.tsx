@@ -15,7 +15,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const progressPercent = Math.round((unlockedCount / achievements.length) * 100);
 
   return (
-    <div className="absolute inset-0 bg-slate-950/95 z-50 flex flex-col p-3 sm:p-5 text-white overflow-hidden select-none">
+    <div className="watch-safe absolute inset-0 bg-slate-950/95 z-50 flex flex-col p-3 sm:p-5 text-white overflow-hidden select-none">
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-800">
         <div className="flex items-center gap-2">

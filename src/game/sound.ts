@@ -2,16 +2,11 @@ import { BerryType } from './types';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
-  constructor() {
-    try {
-      this.isMuted = localStorage.getItem('pokewatch_muted') === 'true';
-    } catch {
-      this.isMuted = false;
-    }
-  }
+  // En el reloj el altavoz suena mal: solo feedback por vibracion.
+  private readonly audioEnabled = false;
 
   private getContext(): AudioContext | null {
-    if (this.isMuted) return null;
+    if (!this.audioEnabled) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
@@ -22,25 +17,6 @@ class SoundEngine {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
-  }
-
-  public setMuted(muted: boolean) {
-    this.isMuted = muted;
-    try {
-      localStorage.setItem('pokewatch_muted', muted ? 'true' : 'false');
-    } catch {
-      // ignore
-    }
-  }
-
-  public getMuted(): boolean {
-    return this.isMuted;
-  }
-
-  public toggleMute(): boolean {
-    const next = !this.isMuted;
-    this.setMuted(next);
-    return next;
   }
 
   public triggerHaptic(pattern: number | number[] = 25) {
@@ -54,6 +30,7 @@ class SoundEngine {
   }
 
   public playSelect() {
+    this.triggerHaptic(12);
     const ctx = this.getContext();
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -165,6 +142,40 @@ class SoundEngine {
       osc.stop(start + note.d + 0.02);
 
       start += note.d * 0.85;
+    });
+  }
+
+  /** Subida de nivel / captura: arpegio corto y alegre. */
+  public playLevelUp() {
+    this.triggerHaptic([30, 30, 60]);
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const notes = [
+      { f: 659.25, d: 0.09 }, // E5
+      { f: 830.61, d: 0.09 }, // G#5
+      { f: 987.77, d: 0.09 }, // B5
+      { f: 1318.5, d: 0.22 }  // E6
+    ];
+
+    let start = ctx.currentTime;
+    notes.forEach((note) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(note.f, start);
+
+      gain.gain.setValueAtTime(0.12, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + note.d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(start);
+      osc.stop(start + note.d + 0.02);
+
+      start += note.d * 0.8;
     });
   }
 }

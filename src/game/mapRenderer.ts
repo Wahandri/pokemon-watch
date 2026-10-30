@@ -1,4 +1,5 @@
-import { BerryItem, PokemonInfo } from './types';
+import { BerryItem, WildPokemon } from './types';
+import { walkSprite } from './sprites';
 import { BERRY_DEFINITIONS } from './pokemonData';
 
 export interface FloatingText {
@@ -24,6 +25,9 @@ export interface Particle {
 
 export class MapRenderer {
   private spriteCache: Map<string, HTMLImageElement> = new Map();
+  private lastPlayerX = 0;
+  private lastPlayerY = 0;
+  private facing: 'down' | 'up' | 'left' | 'right' = 'down';
   private particles: Particle[] = [];
   private floatingTexts: FloatingText[] = [];
   private grassRustleTimer: number = 0;
@@ -91,11 +95,13 @@ export class MapRenderer {
     playerFacingLeft: boolean,
     isMoving: boolean,
     walkDistance: number,
-    activePokemon: PokemonInfo,
+    activeSpeciesId: number,
+    magnetRadius: number,
     berries: BerryItem[],
     dt: number,
     hasSpeedBuff: boolean,
-    hasMagnetBuff: boolean
+    hasMagnetBuff: boolean,
+    wilds: WildPokemon[] = []
   ) {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
@@ -124,7 +130,7 @@ export class MapRenderer {
     const pScreenY = height / 2;
     ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
     ctx.beginPath();
-    ctx.ellipse(pScreenX, pScreenY + 16, 15, 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(pScreenX, pScreenY + 18, 18, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // 4. Buff visual auras
@@ -140,18 +146,31 @@ export class MapRenderer {
       ctx.setLineDash([4, 4]);
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(pScreenX, pScreenY + 4, activePokemon.magnetRadius * 0.8, 0, Math.PI * 2);
+      ctx.arc(pScreenX, pScreenY + 4, magnetRadius * 0.8, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
     // 5. Draw Pokémon Sprite
+    const deltaX = playerX - this.lastPlayerX;
+    const deltaY = playerY - this.lastPlayerY;
+    if (Math.abs(deltaX) > 0.05 || Math.abs(deltaY) > 0.05) {
+      if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+        this.facing = deltaX < 0 ? 'left' : 'right';
+      } else {
+        this.facing = deltaY < 0 ? 'up' : 'down';
+      }
+    }
+    this.lastPlayerX = playerX;
+    this.lastPlayerY = playerY;
+
+    this.drawWilds(ctx, wilds, camX, camY, now, pScreenX, pScreenY);
+
     this.drawPokemon(
       ctx,
-      activePokemon,
+      activeSpeciesId,
       pScreenX,
       pScreenY,
-      playerFacingLeft,
       isMoving,
       walkDistance
     );
@@ -161,6 +180,9 @@ export class MapRenderer {
 
     // 7. Update and draw floating score texts
     this.updateAndDrawFloatingTexts(ctx, camX, camY, dt);
+
+    // 8. Flecha hacia el salvaje mas cercano, en el borde de la esfera
+    this.drawWildCompass(ctx, wilds, playerX, playerY, width, height);
 
     ctx.restore();
   }
@@ -287,43 +309,148 @@ export class MapRenderer {
     ctx.fill();
   }
 
+  /** Dibuja a los salvajes que deambulan por el mapa. */
+  /** Triangulo en el borde de la esfera apuntando al salvaje mas cercano. */
+  private drawWildCompass(
+    ctx: CanvasRenderingContext2D,
+    wilds: WildPokemon[],
+    playerX: number,
+    playerY: number,
+    width: number,
+    height: number
+  ) {
+    if (!wilds.length) return;
+
+    let nearest = wilds[0];
+    let best = Infinity;
+    for (const wild of wilds) {
+      const d = Math.hypot(wild.x - playerX, wild.y - playerY);
+      if (d < best) {
+        best = d;
+        nearest = wild;
+      }
+    }
+
+    // Si ya esta cerca se ve en pantalla: no hace falta flecha.
+    if (best < 160) return;
+
+    const angle = Math.atan2(nearest.y - playerY, nearest.x - playerX);
+    const radius = Math.min(width, height) / 2 - 16;
+    const cx = width / 2 + Math.cos(angle) * radius;
+    const cy = height / 2 + Math.sin(angle) * radius;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    const pulse = 0.65 + Math.abs(Math.sin(Date.now() / 320)) * 0.35;
+    ctx.globalAlpha = pulse;
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(12, 0);
+    ctx.lineTo(-6, -9);
+    ctx.lineTo(-2, 0);
+    ctx.lineTo(-6, 9);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  private drawWilds(
+    ctx: CanvasRenderingContext2D,
+    wilds: WildPokemon[],
+    camX: number,
+    camY: number,
+    now: number,
+    playerScreenX: number,
+    playerScreenY: number
+  ) {
+    for (const wild of wilds) {
+      const screenX = wild.x + camX;
+      const screenY = wild.y + camY;
+      if (screenX < -60 || screenX > ctx.canvas.width + 60 || screenY < -60 || screenY > ctx.canvas.height + 60) {
+        continue;
+      }
+
+      const img = this.spriteCache.get(walkSprite(wild.speciesId));
+      const frame = Math.floor(now / 160) % 2;
+      const sourceX = (4 + frame) * 32;
+      const size = 64;
+      const facingRight = playerScreenX > screenX;
+
+      ctx.save();
+      ctx.translate(screenX, screenY);
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
+      ctx.beginPath();
+      ctx.ellipse(0, 16, 14, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (facingRight) {
+        ctx.scale(-1, 1);
+      }
+
+      if (img && img.complete && img.naturalWidth >= 192) {
+        ctx.drawImage(img, sourceX, 0, 32, 32, -size / 2, -size / 2 - 6, size, size);
+      } else {
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  }
+
   private drawPokemon(
     ctx: CanvasRenderingContext2D,
-    pokemon: PokemonInfo,
+    speciesId: number,
     x: number,
     y: number,
-    facingLeft: boolean,
     isMoving: boolean,
     walkDistance: number
   ) {
-    // Walking bob animation
-    const bob = isMoving ? Math.sin(walkDistance * 0.15) * 3 : Math.sin(Date.now() * 0.003) * 1.5;
+    // La hoja de sprites trae 6 fotogramas de 32x32:
+    //   [0,1] mirando abajo  [2,3] arriba  [4,5] lateral (mirando a la izquierda)
+    const frame = isMoving ? Math.floor(walkDistance / 18) % 2 : 0;
+    const directionOffset = this.facing === 'down' ? 0 : this.facing === 'up' ? 2 : 4;
+    const sourceX = (directionOffset + frame) * 32;
+
+    // Pequeño balanceo solo cuando esta quieto (andando ya lo marca el sprite)
+    const bob = isMoving ? 0 : Math.sin(Date.now() * 0.003) * 1.5;
     const drawY = y + bob;
 
-    const img = this.spriteCache.get(pokemon.spriteUrl);
+    const img = this.spriteCache.get(walkSprite(speciesId));
 
     ctx.save();
     ctx.translate(x, drawY);
 
-    if (facingLeft) {
+    // El lateral del sprite mira a la izquierda: para ir a la derecha se voltea.
+    if (this.facing === 'right') {
       ctx.scale(-1, 1);
     }
 
-    if (img && img.complete && img.naturalWidth > 0) {
-      // Draw official sprite with pixel scaling (64x64)
-      const size = 56;
-      ctx.drawImage(img, -size / 2, -size / 2 - 4, size, size);
+    if (img && img.complete && img.naturalWidth >= 192) {
+      // 32x32 por fotograma, ampliado sin suavizar (pixel art)
+      const size = 88;
+      ctx.drawImage(img, sourceX, 0, 32, 32, -size / 2, -size / 2 - 8, size, size);
     } else {
       // Fallback procedural pixel creature representation
-      this.drawProceduralPokemon(ctx, pokemon);
+      this.drawProceduralPokemon(ctx);
     }
 
     ctx.restore();
   }
 
-  private drawProceduralPokemon(ctx: CanvasRenderingContext2D, pokemon: PokemonInfo) {
+  private drawProceduralPokemon(ctx: CanvasRenderingContext2D) {
     // Procedural cute Pokémon ball avatar
-    ctx.fillStyle = pokemon.accentColor;
+    ctx.fillStyle = '#fbbf24';
     ctx.beginPath();
     ctx.arc(0, 0, 16, 0, Math.PI * 2);
     ctx.fill();

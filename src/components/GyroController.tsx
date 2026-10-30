@@ -43,10 +43,16 @@ export const GyroController: React.FC<GyroControllerProps> = ({
     const handleOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma !== null && e.beta !== null) {
         setGyroState((prev) => {
+          const gamma = Math.round(e.gamma || 0);
+          const beta = Math.round(e.beta || 0);
           const newState = {
             ...prev,
-            gamma: Math.round(e.gamma || 0),
-            beta: Math.round(e.beta || 0),
+            gamma,
+            beta,
+            // La primera lectura marca el centro: en el reloj la muneca nunca
+            // esta a 0 grados y el personaje se iria solo.
+            calibratedGamma: prev.hasHardwareGyro ? prev.calibratedGamma : gamma,
+            calibratedBeta: prev.hasHardwareGyro ? prev.calibratedBeta : beta,
             hasHardwareGyro: true,
             isActive: true
           };

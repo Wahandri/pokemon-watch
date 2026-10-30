@@ -9,7 +9,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.25,
     magnetRadius: 45,
     passiveAbility: 'Chispa Rápida: +25% velocidad base',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+    spriteUrl: 'sprites/portrait/pikachu.png',
+    walkSpriteUrl: 'sprites/walk/pikachu.png',
     accentColor: '#fbbf24',
     generation: 'Gen 1 (Kanto)'
   },
@@ -21,7 +22,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.15,
     magnetRadius: 55,
     passiveAbility: 'Llama Guía: Mayor radio de atracción',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png',
+    spriteUrl: 'sprites/portrait/charizard.png',
+    walkSpriteUrl: 'sprites/walk/charizard.png',
     accentColor: '#f97316',
     generation: 'Gen 1 (Kanto)'
   },
@@ -33,7 +35,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.05,
     magnetRadius: 50,
     passiveAbility: 'Clorofila: Paso suave en hierba alta',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
+    spriteUrl: 'sprites/portrait/bulbasaur.png',
+    walkSpriteUrl: 'sprites/walk/bulbasaur.png',
     accentColor: '#10b981',
     generation: 'Gen 1 (Kanto)'
   },
@@ -45,7 +48,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.1,
     magnetRadius: 45,
     passiveAbility: 'Torrente: Gran estabilidad giroscópica',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png',
+    spriteUrl: 'sprites/portrait/squirtle.png',
+    walkSpriteUrl: 'sprites/walk/squirtle.png',
     accentColor: '#38bdf8',
     generation: 'Gen 1 (Kanto)'
   },
@@ -57,7 +61,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.2,
     magnetRadius: 50,
     passiveAbility: 'Adaptabilidad: Doble aparición de bayas raras',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png',
+    spriteUrl: 'sprites/portrait/eevee.png',
+    walkSpriteUrl: 'sprites/walk/eevee.png',
     accentColor: '#d97706',
     generation: 'Gen 1 (Kanto)'
   },
@@ -69,7 +74,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.3,
     magnetRadius: 40,
     passiveAbility: 'Levitación: Flota sin fricción por el terreno',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png',
+    spriteUrl: 'sprites/portrait/gengar.png',
+    walkSpriteUrl: 'sprites/walk/gengar.png',
     accentColor: '#8b5cf6',
     generation: 'Gen 1 (Kanto)'
   },
@@ -81,7 +87,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.2,
     magnetRadius: 65,
     passiveAbility: 'Sensor Aura: Detecta bayas a gran distancia',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png',
+    spriteUrl: 'sprites/portrait/lucario.png',
+    walkSpriteUrl: 'sprites/walk/lucario.png',
     accentColor: '#0284c7',
     generation: 'Gen 4 (Sinnoh)'
   },
@@ -93,20 +100,22 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.35,
     magnetRadius: 45,
     passiveAbility: 'Ninja Ágil: El más veloz con giroscopio',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/658.png',
+    spriteUrl: 'sprites/portrait/greninja.png',
+    walkSpriteUrl: 'sprites/walk/greninja.png',
     accentColor: '#2563eb',
     generation: 'Gen 6 (Kalos)'
   },
   {
-    id: 150,
-    name: 'Mewtwo',
-    spanishName: 'Mewtwo',
+    id: 151,
+    name: 'Mew',
+    spanishName: 'Mew',
     types: ['psychic'],
-    speed: 1.2,
+    speed: 1.25,
     magnetRadius: 80,
-    passiveAbility: 'Telequinesis: Succiona bayas desde lejos',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png',
-    accentColor: '#c084fc',
+    passiveAbility: 'Psicoquinesis: Atrae bayas desde muy lejos',
+    spriteUrl: 'sprites/portrait/mew.png',
+    walkSpriteUrl: 'sprites/walk/mew.png',
+    accentColor: '#f9a8d4',
     generation: 'Gen 1 (Kanto)'
   },
   {
@@ -117,7 +126,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 0.9,
     magnetRadius: 60,
     passiveAbility: 'Gran Apetito: +50% puntos de cada baya',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png',
+    spriteUrl: 'sprites/portrait/snorlax.png',
+    walkSpriteUrl: 'sprites/walk/snorlax.png',
     accentColor: '#0d9488',
     generation: 'Gen 1 (Kanto)'
   },
@@ -129,7 +139,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.25,
     magnetRadius: 50,
     passiveAbility: 'Velo Arena: Acelera al mantener movimiento',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png',
+    spriteUrl: 'sprites/portrait/garchomp.png',
+    walkSpriteUrl: 'sprites/walk/garchomp.png',
     accentColor: '#1e3a8a',
     generation: 'Gen 4 (Sinnoh)'
   },
@@ -141,21 +152,23 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.1,
     magnetRadius: 70,
     passiveAbility: 'Sincronía: Prolonga el efecto de las bayas',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/282.png',
+    spriteUrl: 'sprites/portrait/gardevoir.png',
+    walkSpriteUrl: 'sprites/walk/gardevoir.png',
     accentColor: '#34d399',
     generation: 'Gen 3 (Hoenn)'
   },
   {
-    id: 384,
-    name: 'Rayquaza',
-    spanishName: 'Rayquaza',
+    id: 149,
+    name: 'Dragonite',
+    spanishName: 'Dragonite',
     types: ['dragon'],
-    speed: 1.3,
+    speed: 1.2,
     magnetRadius: 60,
-    passiveAbility: 'Bucle Aire: Movimiento libre en cualquier dirección',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png',
-    accentColor: '#15803d',
-    generation: 'Gen 3 (Hoenn)'
+    passiveAbility: 'Aura Dragón: Movimiento libre en cualquier dirección',
+    spriteUrl: 'sprites/portrait/dragonite.png',
+    walkSpriteUrl: 'sprites/walk/dragonite.png',
+    accentColor: '#f59e0b',
+    generation: 'Gen 1 (Kanto)'
   },
   {
     id: 197,
@@ -165,7 +178,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.15,
     magnetRadius: 55,
     passiveAbility: 'Luz Lunar: Brilla en el mapa facilitando la búsqueda',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/197.png',
+    spriteUrl: 'sprites/portrait/umbreon.png',
+    walkSpriteUrl: 'sprites/walk/umbreon.png',
     accentColor: '#eab308',
     generation: 'Gen 2 (Johto)'
   },
@@ -177,7 +191,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.15,
     magnetRadius: 50,
     passiveAbility: 'Nado Rápido: Clásico de Hoenn GBA muy balanceado',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/258.png',
+    spriteUrl: 'sprites/portrait/mudkip.png',
+    walkSpriteUrl: 'sprites/walk/mudkip.png',
     accentColor: '#38bdf8',
     generation: 'Gen 3 (Hoenn)'
   },
@@ -189,7 +204,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.2,
     magnetRadius: 45,
     passiveAbility: 'Impulso: Aumenta velocidad con cada baya',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png',
+    spriteUrl: 'sprites/portrait/torchic.png',
+    walkSpriteUrl: 'sprites/walk/torchic.png',
     accentColor: '#f97316',
     generation: 'Gen 3 (Hoenn)'
   },
@@ -201,7 +217,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.25,
     magnetRadius: 45,
     passiveAbility: 'Espesura: Ágil en zonas boscosas',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/252.png',
+    spriteUrl: 'sprites/portrait/treecko.png',
+    walkSpriteUrl: 'sprites/walk/treecko.png',
     accentColor: '#22c55e',
     generation: 'Gen 3 (Hoenn)'
   },
@@ -213,7 +230,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.15,
     magnetRadius: 45,
     passiveAbility: 'Ascuas: Rastro ardiente visible en el reloj',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/155.png',
+    spriteUrl: 'sprites/portrait/cyndaquil.png',
+    walkSpriteUrl: 'sprites/walk/cyndaquil.png',
     accentColor: '#ea580c',
     generation: 'Gen 2 (Johto)'
   },
@@ -225,7 +243,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.05,
     magnetRadius: 60,
     passiveAbility: 'Flotación: Amortigua giros bruscos de muñeca',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png',
+    spriteUrl: 'sprites/portrait/jigglypuff.png',
+    walkSpriteUrl: 'sprites/walk/jigglypuff.png',
     accentColor: '#f472b6',
     generation: 'Gen 1 (Kanto)'
   },
@@ -237,7 +256,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.2,
     magnetRadius: 50,
     passiveAbility: 'Disfraz: Protección contra movimientos falsos',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/778.png',
+    spriteUrl: 'sprites/portrait/mimikyu.png',
+    walkSpriteUrl: 'sprites/walk/mimikyu.png',
     accentColor: '#ca8a04',
     generation: 'Gen 7 (Alola)'
   },
@@ -249,7 +269,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.0,
     magnetRadius: 65,
     passiveAbility: 'Hidrobomba: Atrae bayas de agua lejanas',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png',
+    spriteUrl: 'sprites/portrait/blastoise.png',
+    walkSpriteUrl: 'sprites/walk/blastoise.png',
     accentColor: '#2563eb',
     generation: 'Gen 1 (Kanto)'
   },
@@ -261,7 +282,8 @@ export const POKEMON_LIST: PokemonInfo[] = [
     speed: 1.3,
     magnetRadius: 50,
     passiveAbility: 'Velocidad Extrema: Corre veloz con la muñeca inclinada',
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png',
+    spriteUrl: 'sprites/portrait/arcanine.png',
+    walkSpriteUrl: 'sprites/walk/arcanine.png',
     accentColor: '#dc2626',
     generation: 'Gen 1 (Kanto)'
   }

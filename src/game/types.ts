@@ -20,7 +20,10 @@ export interface PokemonInfo {
   speed: number; // Speed multiplier, e.g. 1.0 to 1.3
   magnetRadius: number; // Berry attraction distance in px (e.g. 35 to 70)
   passiveAbility: string;
+  /** Retrato 32x32 (fotograma frontal) para menus y HUD. */
   spriteUrl: string;
+  /** Hoja 192x32 con 6 fotogramas: abajo, arriba y lateral (andando). */
+  walkSpriteUrl: string;
   accentColor: string;
   generation: string;
 }
@@ -84,3 +87,35 @@ export interface PlayerStats {
 }
 
 export type GameView = 'title' | 'playing' | 'paused' | 'gameover';
+
+/** Pokemon que posee el jugador (cada uno con su nivel y XP). */
+export interface OwnedPokemon {
+  uid: string;
+  speciesId: number;
+  level: number;
+  xp: number;
+  asleepUntil: number; // 0 = despierto
+}
+
+/** Pokemon salvaje que deambula por el mapa. */
+export interface WildPokemon {
+  uid: string;
+  speciesId: number;
+  level: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  targetX: number;
+  targetY: number;
+  repathTimer: number;
+}
+
+export interface SaveData {
+  version: number;
+  owned: OwnedPokemon[];
+  activeUid: string | null;
+  dexSeen: number[];
+  dexCaught: number[];
+  berries: number;
+}

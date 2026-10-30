@@ -1,138 +1,155 @@
-import React, { useState } from 'react';
-import { POKEMON_LIST } from '../game/pokemonData';
-import { PokemonInfo } from '../game/types';
-import { Sparkles, Check, X, Shield, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Check, Moon, Sun, Sparkles, Zap } from 'lucide-react';
+import { OwnedPokemon } from '../game/types';
+import { SPECIES_BY_ID } from '../game/gen1Data';
+import { portraitSprite } from '../game/sprites';
+import { isAsleep, wakeCost } from '../game/save';
+import { xpToNext } from '../game/battle';
 import { sounds } from '../game/sound';
 
 interface PokemonSelectorProps {
-  currentPokemon: PokemonInfo;
-  onSelect: (pokemon: PokemonInfo) => void;
+  owned: OwnedPokemon[];
+  activeUid: string | null;
+  berries: number;
+  onSelect: (uid: string) => void;
+  onWake: (uid: string) => void;
   onClose: () => void;
 }
 
+function formatTime(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
 export const PokemonSelector: React.FC<PokemonSelectorProps> = ({
-  currentPokemon,
+  owned,
+  activeUid,
+  berries,
   onSelect,
+  onWake,
   onClose
 }) => {
-  const [selectedId, setSelectedId] = useState<number>(currentPokemon.id);
-  const activePoke = POKEMON_LIST.find((p) => p.id === selectedId) || POKEMON_LIST[0];
+  const [, setTick] = useState(0);
 
-  const handlePick = (poke: PokemonInfo) => {
-    setSelectedId(poke.id);
-    sounds.playSelect();
-  };
+  useEffect(() => {
+    const interval = window.setInterval(() => setTick((value) => value + 1), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
-  const handleConfirm = () => {
-    onSelect(activePoke);
-    onClose();
-  };
+  const now = Date.now();
+  const awakeCount = owned.filter((p) => !isAsleep(p, now)).length;
 
   return (
-    <div className="absolute inset-0 bg-slate-950/95 z-50 flex flex-col p-3 sm:p-5 text-white overflow-hidden select-none">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+    <div className="watch-safe absolute inset-0 bg-slate-950/95 z-50 flex flex-col p-3 sm:p-5 text-white overflow-hidden select-none">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-700">
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <h2
-            className="text-xs sm:text-sm font-bold text-amber-300 tracking-wider"
-            style={{ fontFamily: '"Press Start 2P", monospace' }}
-          >
-            Elegir Pokémon
+          <h2 className="text-lg font-bold text-amber-300 tracking-wider" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+            Equipo
           </h2>
         </div>
-        <button
-          onClick={onClose}
-          aria-label="Cerrar selector"
-          className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Featured Pokémon Card Preview */}
-      <div className="flex items-center gap-3 bg-gradient-to-r from-slate-900 to-slate-800 p-2.5 my-2 rounded-xl border border-slate-700">
-        <div
-          className="w-16 h-16 rounded-xl flex items-center justify-center shadow-inner relative overflow-hidden"
-          style={{ backgroundColor: `${activePoke.accentColor}25`, border: `2px solid ${activePoke.accentColor}` }}
-        >
-          <img
-            src={activePoke.spriteUrl}
-            alt={activePoke.name}
-            className="w-14 h-14 object-contain filter drop-shadow"
-            crossOrigin="anonymous"
-          />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <h3 className="font-bold text-sm text-slate-100 truncate">{activePoke.name}</h3>
-            <span className="text-[10px] text-slate-400">#{activePoke.id}</span>
-          </div>
-          <p className="text-[10px] text-amber-300 truncate font-mono mt-0.5">
-            {activePoke.passiveAbility}
-          </p>
-
-          {/* Stats Bar */}
-          <div className="flex items-center gap-2 mt-1.5 text-[9px] text-slate-300">
-            <span className="flex items-center gap-0.5">
-              <Zap className="w-3 h-3 text-yellow-400" />
-              Vel {Math.round(activePoke.speed * 100)}%
-            </span>
-            <span className="flex items-center gap-0.5">
-              <Shield className="w-3 h-3 text-pink-400" />
-              Imán {activePoke.magnetRadius}px
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[14px] font-mono text-amber-300">🍓 {berries}</span>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar equipo"
+            className="w-8 h-8 rounded-full bg-slate-800 active:bg-slate-700 flex items-center justify-center text-slate-300"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* 22 Pokémon Grid (Scrollable for Smartwatch touch or desktop) */}
-      <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-4 gap-2 py-1 scrollbar-thin">
-        {POKEMON_LIST.map((poke) => {
-          const isSelected = poke.id === selectedId;
+      <div className="flex-1 overflow-y-auto pr-1 py-1.5 space-y-1.5">
+        {owned.map((pokemon) => {
+          const species = SPECIES_BY_ID[pokemon.speciesId];
+          const asleep = isAsleep(pokemon, now);
+          const active = pokemon.uid === activeUid;
+          const cost = wakeCost(pokemon.level);
+          const need = xpToNext(pokemon.level);
+          const ratio = Math.min(1, pokemon.xp / need);
+
           return (
-            <button
-              key={poke.id}
-              onClick={() => handlePick(poke)}
-              aria-label={`Seleccionar ${poke.name}`}
-              className={`relative flex flex-col items-center justify-center p-1.5 rounded-xl border transition-all ${
-                isSelected
-                  ? 'bg-amber-500/20 border-amber-400 scale-105 shadow-md shadow-amber-500/20'
-                  : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 active:scale-95'
+            <div
+              key={pokemon.uid}
+              className={`flex items-center gap-2.5 rounded-2xl border px-2.5 py-1 ${
+                active ? 'bg-amber-500/15 border-amber-400/80' : 'bg-slate-900/80 border-slate-700'
               }`}
             >
               <img
-                src={poke.spriteUrl}
-                alt={poke.name}
-                className="w-10 h-10 object-contain"
-                crossOrigin="anonymous"
-                loading="lazy"
+                src={portraitSprite(pokemon.speciesId)}
+                alt={species.name}
+                className={`w-12 h-12 object-contain shrink-0 ${asleep ? 'opacity-40 grayscale' : ''}`}
               />
-              <span className="text-[9px] font-medium text-slate-300 truncate w-full text-center mt-0.5">
-                {poke.name}
-              </span>
-              {isSelected && (
-                <div className="absolute top-1 right-1 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center text-black">
-                  <Check className="w-2.5 h-2.5 stroke-[3]" />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[16px] font-bold truncate">{species.name}</span>
+                  <span className="text-[14px] font-mono text-slate-300 shrink-0">Nv {pokemon.level}</span>
                 </div>
+
+                {asleep ? (
+                  <span className="text-[12px] text-indigo-300 flex items-center gap-1 mt-0.5">
+                    <Moon className="w-3.5 h-3.5" /> Dormido · {formatTime(pokemon.asleepUntil - now)}
+                  </span>
+                ) : (
+                  <>
+                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden mt-1">
+                      <div className="h-full bg-cyan-400" style={{ width: `${ratio * 100}%` }} />
+                    </div>
+                    <span className="text-[12px] text-slate-400 font-mono">
+                      {pokemon.xp}/{need} XP
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {asleep ? (
+                <button
+                  onClick={() => {
+                    if (berries >= cost) {
+                      sounds.playLevelUp();
+                      onWake(pokemon.uid);
+                    }
+                  }}
+                  disabled={berries < cost}
+                  aria-label={`Despertar a ${species.name} por ${cost} bayas`}
+                  className={`shrink-0 flex flex-col items-center justify-center w-[68px] h-14 rounded-xl border text-[11px] font-bold ${
+                    berries >= cost
+                      ? 'bg-indigo-500/25 border-indigo-400 text-indigo-100 active:scale-95'
+                      : 'bg-slate-900 border-slate-700 text-slate-600'
+                  }`}
+                >
+                  <Sun className="w-4 h-4" />
+                  <span>{cost} 🍓</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    sounds.playSelect();
+                    onSelect(pokemon.uid);
+                  }}
+                  aria-label={`Usar a ${species.name}`}
+                  disabled={active}
+                  className={`shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center ${
+                    active
+                      ? 'bg-amber-400 border-amber-300 text-slate-950'
+                      : 'bg-slate-800 border-slate-600 text-slate-300 active:scale-95'
+                  }`}
+                >
+                  {active ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-4 h-4" />}
+                </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
 
-      {/* Confirm Button */}
-      <div className="pt-2">
-        <button
-          onClick={handleConfirm}
-          aria-label="Confirmar Pokémon"
-          className="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-transform cursor-pointer"
-        >
-          <Check className="w-4 h-4 stroke-[3]" />
-          <span>¡Elegir a {activePoke.name}!</span>
-        </button>
-      </div>
+      <p className="pt-1 text-center text-[11px] text-slate-400">
+        {awakeCount === 0
+          ? 'Todo el equipo duerme: recoge bayas o espera'
+          : `${awakeCount} despiertos · ${owned.length} en el equipo`}
+      </p>
     </div>
   );
 };
